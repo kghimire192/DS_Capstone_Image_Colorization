@@ -1,3 +1,6 @@
+# %% --------------------------------------- Imports -------------------------------------------------------------------
+import os
+import cv2
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -9,40 +12,32 @@ from sklearn.model_selection import train_test_split
 import math
 from tensorflow.python.keras.utils import losses_utils
 
+# %% --------------------------------------- Set-Up --------------------------------------------------------------------
 tf.config.experimental.list_physical_devices('GPU')
-
-import cv2
-
-# from google.colab.patches import cv2_imshow
-
 tf.random.set_seed(42)
 np.random.seed(42)
 
+# %% ----------------------------------- Hyper Parameters and Constants ------------------------------------------------
 IMG_SIZE = [224, 224]
 N_CHANNELS = 3
 N_CLASSES = 169
 DIR_BASE = '/home/ubuntu/capstone/train_test/'
 PRED_DIR = '/home/ubuntu/capstone//prediction/'
-
 # DIR_BASE = '/Users/kanchanghimire/Development/Preprocessing/train_test/'
 VALID_SIZE = 0.1765
 BATCH_SIZE = 8
 NUM_EPOCHS = 10
 
-# Loading Data
+# %% -------------------------------------- Data Prep ------------------------------------------------------------------
 x_train = np.load(file=DIR_BASE + "x_train.npy", allow_pickle=True)
 y_train = np.load(file=DIR_BASE + "y_train.npy", allow_pickle=True)
-
 x_test = np.load(file=DIR_BASE + "x_test.npy", allow_pickle=True)
 y_test = np.load(file=DIR_BASE + "y_test.npy", allow_pickle=True)
-
 x_pred = np.load(file=PRED_DIR + "x_pred.npy", allow_pickle=True)
 
-# Split train set into train and validation
 x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, test_size=VALID_SIZE)
 
 
-# Create DataGenerator class
 class CustomDataGenerator(tf.keras.utils.Sequence):
 
     def __init__(self, x_set, y_set, batch_size, num_classes=N_CLASSES):
@@ -70,7 +65,7 @@ validation_generator = CustomDataGenerator(x_valid, y_valid, batch_size=BATCH_SI
 testing_generator = CustomDataGenerator(x_test, y_test, batch_size=BATCH_SIZE)
 
 
-# Model Architecture
+# %% -------------------------------------- FCN8 Class -----------------------------------------------------------------
 def FCN8(image_size, ch_in, ch_out):
     inputs = Input(shape=(*image_size, ch_in), name='input')
 
@@ -114,15 +109,11 @@ def FCN8(image_size, ch_in, ch_out):
     return model
 
 
+# %% -------------------------------------- Training Prep ----------------------------------------------------------
 model = FCN8(IMG_SIZE, N_CHANNELS, N_CLASSES)
 model.summary()
 
 
-# Training Prep
-
-
-# TODO: Dice loss
-# @tf.function
 def dice_loss(y_true, y_pred, eps=1e-6, spatial_axes=[1, 2], from_logits=False):
     num_classes = y_pred.shape[-1]
 
@@ -154,25 +145,20 @@ accuracy = tf.metrics.Accuracy(name='acc')
 meanIoU = tf.metrics.MeanIoU(num_classes=N_CLASSES, name='mIoU')
 loss_c = tf.keras.losses.CategoricalCrossentropy()
 loss_d = DiceLoss()
-
 optimizer = tf.keras.optimizers.Adam()
 
+# %% -------------------------------------- Training -------------------------------------------------------------------
 model.compile(optimizer=optimizer, loss=loss_d, metrics=[accuracy, meanIoU])
-
-# history = model.fit_generator(generator=training_generator,
-# validation_data=validation_generator,
-# epochs=NUM_EPOCHS)
 
 history = model.fit(x=training_generator, validation_data=validation_generator,
                     epochs=NUM_EPOCHS)
 
+# %% -------------------------------------- Testing --------------------------------------------------------------------
 hist_test = model.evaluate(x=testing_generator)
 print(hist_test)
 
-print("Predicting")
 
-
-# Prediction
+# %% -------------------------------------- Prediction -----------------------------------------------------------------
 def predict(images, model):
     x = images
     y_pred = np.argmax(model.predict(x), axis=-1)
