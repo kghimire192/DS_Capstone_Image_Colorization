@@ -9,6 +9,12 @@ Before the rise of color photography, images were taken in black and white scale
 ### Dataset
 The Source of Data is “Places365-Standard” dataset by Massachusetts Institute of Technology (MIT). The link to the data is http://places2.csail.mit.edu/download.html. Data was further cleaned and model was trained on about 20,000 landscape images.
 
+### Technical Requirement
+Python 3
+Tensorflow 2
+pip install opencv-python
+pip install segmentation-models
+
 
 
 
