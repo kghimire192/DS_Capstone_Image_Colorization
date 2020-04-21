@@ -2,7 +2,6 @@ print("BEGIN PREPROCESSING")
 # Imports
 import os
 import cv2
-# from google.colab.patches import cv2_imshow
 import numpy as np
 from sklearn.model_selection import train_test_split
 

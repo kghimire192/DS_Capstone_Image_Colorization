@@ -3,7 +3,7 @@ import cv2
 
 PRED_DIR = '/home/ubuntu/capstone//prediction/'
 
-x = np.load(PRED_DIR + "x_pred_new.npy", allow_pickle=True)
+x = np.load(PRED_DIR + "x_pred.npy", allow_pickle=True)
 y_pred = np.load(PRED_DIR + "y_pred.npy", allow_pickle=True)
 
 print(x.shape)
