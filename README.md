@@ -1,6 +1,7 @@
 ## Image Colorization Using Neural Network
 
 ### Project Overview
+The project was done as Capstone project for Master's in Data Science program. FCN and U-Net were the two architecture used to build models (along with pretrained CNN models such as VGG-16, ResNet-101 and MobileNetV2) and solve the problem. 
 
 ### Problem and Motivation
 Before the rise of color photography, images were taken in black and white scale. Much of the ancient history is stored in black and white images which has lost the true essence of time and place. Converting those images into color images can help people feel connected to the historical events stored in photographs. However, most photo editing software are time-consuming and require lot of human interaction.
